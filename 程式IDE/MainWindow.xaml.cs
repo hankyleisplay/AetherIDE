@@ -40,7 +40,7 @@ namespace 程式IDE
             // Configure Window
             Title = "AetherIDE";
             ExtendsContentIntoTitleBar = true;
-            SetTitleBar(AppTitleBar);
+            SetTitleBar(TitleBarDragRegion);
 
             // Resize window to comfortable IDE dimensions
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
@@ -293,6 +293,40 @@ namespace 程式IDE
             {
                 fe.RequestedTheme = ViewModel.IsDarkMode ? ElementTheme.Dark : ElementTheme.Light;
             }
+        }
+
+        private void ThemeOptionDark_Click(object sender, RoutedEventArgs e)
+        {
+            SetAppTheme(true, "vs-dark", "已切換至深色主題 (VS Dark)");
+        }
+
+        private void ThemeOptionLight_Click(object sender, RoutedEventArgs e)
+        {
+            SetAppTheme(false, "vs", "已切換至淺色主題 (VS Light)");
+        }
+
+        private void ThemeOptionCyberpunk_Click(object sender, RoutedEventArgs e)
+        {
+            SetAppTheme(true, "cyberpunk", "已切換至賽博龐克紫主題 (Cyberpunk Dark)");
+        }
+
+        private void ThemeOptionOcean_Click(object sender, RoutedEventArgs e)
+        {
+            SetAppTheme(true, "ocean", "已切換至海洋深藍主題 (Ocean Blue)");
+        }
+
+        private async void SetAppTheme(bool isDark, string monacoTheme, string statusText)
+        {
+            ViewModel.IsDarkMode = isDark;
+            if (Content is FrameworkElement fe)
+            {
+                fe.RequestedTheme = isDark ? ElementTheme.Dark : ElementTheme.Light;
+            }
+            if (_isWebViewReady && EditorWebView.CoreWebView2 != null)
+            {
+                await EditorWebView.ExecuteScriptAsync($"window.setTheme('{monacoTheme}');");
+            }
+            ViewModel.StatusMessage = statusText;
         }
 
         private void BtnToggleSidebar_Click(object sender, RoutedEventArgs e)

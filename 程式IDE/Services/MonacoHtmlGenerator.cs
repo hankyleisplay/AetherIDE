@@ -58,6 +58,42 @@ namespace 程式IDE.Services
           require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.46.0/min/vs' } });
           require(['vs/editor/editor.main'], function () {
             indicator.style.display = 'none';
+
+            // Define custom themes
+            monaco.editor.defineTheme('cyberpunk', {
+              base: 'vs-dark',
+              inherit: true,
+              rules: [
+                { token: 'comment', foreground: '7c6f9b', fontStyle: 'italic' },
+                { token: 'keyword', foreground: 'f43f5e', fontStyle: 'bold' },
+                { token: 'string', foreground: '06b6d4' },
+                { token: 'number', foreground: 'f59e0b' }
+              ],
+              colors: {
+                'editor.background': '#150f28',
+                'editor.foreground': '#f3e8ff',
+                'editorCursor.foreground': '#ec4899',
+                'editor.lineHighlightBackground': '#221544'
+              }
+            });
+
+            monaco.editor.defineTheme('ocean', {
+              base: 'vs-dark',
+              inherit: true,
+              rules: [
+                { token: 'comment', foreground: '64748b', fontStyle: 'italic' },
+                { token: 'keyword', foreground: '38bdf8', fontStyle: 'bold' },
+                { token: 'string', foreground: '34d399' },
+                { token: 'number', foreground: 'fbbf24' }
+              ],
+              colors: {
+                'editor.background': '#0b1329',
+                'editor.foreground': '#e2e8f0',
+                'editorCursor.foreground': '#38bdf8',
+                'editor.lineHighlightBackground': '#142144'
+              }
+            });
+
             editor = monaco.editor.create(document.getElementById('editor'), {
               value: '',
               language: currentLanguage,
@@ -158,9 +194,18 @@ namespace 程式IDE.Services
       if (editor) {
         monaco.editor.setTheme(theme);
       }
-      const isLight = theme === 'vs';
-      const newBg = isLight ? '#ffffff' : '#1e1e1e';
-      const newFg = isLight ? '#000000' : '#d4d4d4';
+      let newBg = '#1e1e1e';
+      let newFg = '#d4d4d4';
+      if (theme === 'vs') {
+        newBg = '#ffffff';
+        newFg = '#000000';
+      } else if (theme === 'cyberpunk') {
+        newBg = '#150f28';
+        newFg = '#f3e8ff';
+      } else if (theme === 'ocean') {
+        newBg = '#0b1329';
+        newFg = '#e2e8f0';
+      }
       document.body.style.backgroundColor = newBg;
       fallback.style.backgroundColor = newBg;
       fallback.style.color = newFg;

@@ -43,17 +43,19 @@
                 <TextBlock Text="{x:Bind ViewModel.WorkspaceName, Mode=OneWay}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
             </StackPanel>
 
-            <!-- Center Search / Command Bar -->
-            <Grid Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="380">
+            <!-- Center Search / Command Bar (TitleBar Drag Region) -->
+            <Grid x:Name="TitleBarDragRegion" Grid.Column="1" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <AutoSuggestBox x:Name="TitleSearchBox"
+                                Width="380"
                                 PlaceholderText="搜尋檔案、命令或向 Aether AI 發問 (Ctrl+P)"
                                 QueryIcon="Find"
                                 VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
                                 QuerySubmitted="TitleSearchBox_QuerySubmitted" />
             </Grid>
 
-            <!-- Right Quick Action Bar -->
-            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,140,0" Spacing="4">
+            <!-- Right Quick Action Bar (Independent Interactive Area) -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,148,0" Spacing="4">
                 <!-- Run Button -->
                 <Button x:Name="BtnQuickRun"
                         ToolTipService.ToolTip="執行目前檔案 (F5)"
@@ -81,9 +83,9 @@
                     </StackPanel>
                 </Button>
 
-                <!-- Format Code Button -->
+                <!-- Format Code Button (Using document align icon) -->
                 <Button ToolTipService.ToolTip="格式化程式碼 (Shift+Alt+F)" Click="MenuFormatDocument_Click" Padding="7,5" CornerRadius="4">
-                    <FontIcon Glyph="&#xE790;" FontSize="13" />
+                    <FontIcon Glyph="&#xE8E4;" FontSize="13" />
                 </Button>
 
                 <!-- Save Button -->
@@ -91,10 +93,22 @@
                     <FontIcon Glyph="&#xE74E;" FontSize="13" />
                 </Button>
 
-                <!-- Theme Toggle Button -->
-                <Button ToolTipService.ToolTip="切換深色/淺色主題" Click="BtnThemeToggle_Click" Padding="7,5" CornerRadius="4">
-                    <FontIcon Glyph="&#xE708;" FontSize="13" />
-                </Button>
+                <!-- Theme Palette Button (Interactive DropDown with Palette Icon) -->
+                <DropDownButton x:Name="BtnThemePalette"
+                                ToolTipService.ToolTip="調色盤 (切換主題與配色風格)"
+                                Padding="7,5"
+                                CornerRadius="4">
+                    <FontIcon Glyph="&#xE790;" FontSize="14" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                    <DropDownButton.Flyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="🌙 深色主題 (VS Dark)" Click="ThemeOptionDark_Click" />
+                            <MenuFlyoutItem Text="☀️ 淺色主題 (VS Light)" Click="ThemeOptionLight_Click" />
+                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem Text="🌌 賽博龐克紫 (Cyberpunk Dark)" Click="ThemeOptionCyberpunk_Click" />
+                            <MenuFlyoutItem Text="🌊 海洋深藍 (Ocean Blue)" Click="ThemeOptionOcean_Click" />
+                        </MenuFlyout>
+                    </DropDownButton.Flyout>
+                </DropDownButton>
 
                 <!-- Toggle Sidebar Button -->
                 <Button ToolTipService.ToolTip="切換側邊欄" Click="BtnToggleSidebar_Click" Padding="7,5" CornerRadius="4">
