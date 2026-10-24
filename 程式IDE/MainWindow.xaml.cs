@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.Web.WebView2.Core;
@@ -89,67 +89,6 @@ namespace 程式IDE
         public Visibility BoolToVisibility(int count) => count > 0 ? Visibility.Visible : Visibility.Collapsed;
         public Visibility InverseBoolToVisibility(bool value) => value ? Visibility.Collapsed : Visibility.Visible;
         public Visibility InverseBoolToVisibility(int count) => count == 0 ? Visibility.Visible : Visibility.Collapsed;
-
-        #endregion
-
-        #region MCP & Plugin Handlers
-
-        private void McpServerToggle_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (sender is ToggleSwitch ts && ts.Tag is McpServerConfig server)
-            {
-                server.IsEnabled = ts.IsOn;
-                ViewModel.StatusMessage = $"MCP 伺服器 '{server.Name}' 已{(server.IsEnabled ? "連線啟用" : "中斷連線")}";
-            }
-        }
-
-        private async void BtnAddMcpServer_Click(object sender, RoutedEventArgs e)
-        {
-            var txtName = new TextBox { Header = "伺服器名稱", PlaceholderText = "例如: sqlite-server" };
-            var txtCmd = new TextBox { Header = "執行命令", PlaceholderText = "例如: npx, python, uvx" };
-            var txtArgs = new TextBox { Header = "執行參數", PlaceholderText = "例如: -y @modelcontextprotocol/server-sqlite" };
-
-            var stack = new StackPanel
-            {
-                Spacing = 10,
-                Children = { txtName, txtCmd, txtArgs }
-            };
-
-            var dialog = new ContentDialog
-            {
-                Title = "新增自訂 MCP 伺服器",
-                Content = stack,
-                PrimaryButtonText = "新增",
-                CloseButtonText = "取消",
-                DefaultButton = ContentDialogButton.Primary,
-                XamlRoot = this.Content.XamlRoot
-            };
-
-            var result = await dialog.ShowAsync();
-            if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(txtName.Text))
-            {
-                var newServer = new McpServerConfig
-                {
-                    Name = txtName.Text.Trim(),
-                    Command = string.IsNullOrWhiteSpace(txtCmd.Text) ? "npx" : txtCmd.Text.Trim(),
-                    Arguments = txtArgs.Text.Trim(),
-                    IsEnabled = true,
-                    StatusColor = "#10B981"
-                };
-                newServer.Tools.Add(new McpToolItem { Name = "custom_tool", Description = "自訂 MCP 工具介面" });
-                ViewModel.McpServers.Add(newServer);
-                ViewModel.StatusMessage = $"已成功新增 MCP 伺服器: {newServer.Name}";
-            }
-        }
-
-        private void PluginToggle_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (sender is ToggleSwitch ts && ts.Tag is PluginItem plugin)
-            {
-                plugin.IsEnabled = ts.IsOn;
-                ViewModel.StatusMessage = $"外掛模組 '{plugin.Name}' 已{(plugin.IsEnabled ? "啟用" : "停用")}";
-            }
-        }
 
         #endregion
 
@@ -306,67 +245,6 @@ namespace 程式IDE
         {
             if (!_isWebViewReady || EditorWebView.CoreWebView2 == null) return;
             await EditorWebView.ExecuteScriptAsync($"window.toggleWordWrap({(enabled ? "true" : "false")});");
-        }
-
-        #endregion
-
-        #region MCP & Plugin Handlers
-
-        private void McpServerToggle_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (sender is ToggleSwitch ts && ts.Tag is McpServerConfig server)
-            {
-                server.IsEnabled = ts.IsOn;
-                ViewModel.StatusMessage = $"MCP 伺服器 '{server.Name}' 已{(server.IsEnabled ? "連線啟用" : "中斷連線")}";
-            }
-        }
-
-        private async void BtnAddMcpServer_Click(object sender, RoutedEventArgs e)
-        {
-            var txtName = new TextBox { Header = "伺服器名稱", PlaceholderText = "例如: sqlite-server" };
-            var txtCmd = new TextBox { Header = "執行命令", PlaceholderText = "例如: npx, python, uvx" };
-            var txtArgs = new TextBox { Header = "執行參數", PlaceholderText = "例如: -y @modelcontextprotocol/server-sqlite" };
-
-            var stack = new StackPanel
-            {
-                Spacing = 10,
-                Children = { txtName, txtCmd, txtArgs }
-            };
-
-            var dialog = new ContentDialog
-            {
-                Title = "新增自訂 MCP 伺服器",
-                Content = stack,
-                PrimaryButtonText = "新增",
-                CloseButtonText = "取消",
-                DefaultButton = ContentDialogButton.Primary,
-                XamlRoot = this.Content.XamlRoot
-            };
-
-            var result = await dialog.ShowAsync();
-            if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(txtName.Text))
-            {
-                var newServer = new McpServerConfig
-                {
-                    Name = txtName.Text.Trim(),
-                    Command = string.IsNullOrWhiteSpace(txtCmd.Text) ? "npx" : txtCmd.Text.Trim(),
-                    Arguments = txtArgs.Text.Trim(),
-                    IsEnabled = true,
-                    StatusColor = "#10B981"
-                };
-                newServer.Tools.Add(new McpToolItem { Name = "custom_tool", Description = "自訂 MCP 工具介面" });
-                ViewModel.McpServers.Add(newServer);
-                ViewModel.StatusMessage = $"已成功新增 MCP 伺服器: {newServer.Name}";
-            }
-        }
-
-        private void PluginToggle_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (sender is ToggleSwitch ts && ts.Tag is PluginItem plugin)
-            {
-                plugin.IsEnabled = ts.IsOn;
-                ViewModel.StatusMessage = $"外掛模組 '{plugin.Name}' 已{(plugin.IsEnabled ? "啟用" : "停用")}";
-            }
         }
 
         #endregion
@@ -705,67 +583,6 @@ namespace 程式IDE
 
         #endregion
 
-        #region MCP & Plugin Handlers
-
-        private void McpServerToggle_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (sender is ToggleSwitch ts && ts.Tag is McpServerConfig server)
-            {
-                server.IsEnabled = ts.IsOn;
-                ViewModel.StatusMessage = $"MCP 伺服器 '{server.Name}' 已{(server.IsEnabled ? "連線啟用" : "中斷連線")}";
-            }
-        }
-
-        private async void BtnAddMcpServer_Click(object sender, RoutedEventArgs e)
-        {
-            var txtName = new TextBox { Header = "伺服器名稱", PlaceholderText = "例如: sqlite-server" };
-            var txtCmd = new TextBox { Header = "執行命令", PlaceholderText = "例如: npx, python, uvx" };
-            var txtArgs = new TextBox { Header = "執行參數", PlaceholderText = "例如: -y @modelcontextprotocol/server-sqlite" };
-
-            var stack = new StackPanel
-            {
-                Spacing = 10,
-                Children = { txtName, txtCmd, txtArgs }
-            };
-
-            var dialog = new ContentDialog
-            {
-                Title = "新增自訂 MCP 伺服器",
-                Content = stack,
-                PrimaryButtonText = "新增",
-                CloseButtonText = "取消",
-                DefaultButton = ContentDialogButton.Primary,
-                XamlRoot = this.Content.XamlRoot
-            };
-
-            var result = await dialog.ShowAsync();
-            if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(txtName.Text))
-            {
-                var newServer = new McpServerConfig
-                {
-                    Name = txtName.Text.Trim(),
-                    Command = string.IsNullOrWhiteSpace(txtCmd.Text) ? "npx" : txtCmd.Text.Trim(),
-                    Arguments = txtArgs.Text.Trim(),
-                    IsEnabled = true,
-                    StatusColor = "#10B981"
-                };
-                newServer.Tools.Add(new McpToolItem { Name = "custom_tool", Description = "自訂 MCP 工具介面" });
-                ViewModel.McpServers.Add(newServer);
-                ViewModel.StatusMessage = $"已成功新增 MCP 伺服器: {newServer.Name}";
-            }
-        }
-
-        private void PluginToggle_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (sender is ToggleSwitch ts && ts.Tag is PluginItem plugin)
-            {
-                plugin.IsEnabled = ts.IsOn;
-                ViewModel.StatusMessage = $"外掛模組 '{plugin.Name}' 已{(plugin.IsEnabled ? "啟用" : "停用")}";
-            }
-        }
-
-        #endregion
-
         #region Activity Bar & Sidebar Views
 
         private void HideAllSidebarViews()
@@ -975,67 +792,6 @@ namespace 程式IDE
 
         #endregion
 
-        #region MCP & Plugin Handlers
-
-        private void McpServerToggle_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (sender is ToggleSwitch ts && ts.Tag is McpServerConfig server)
-            {
-                server.IsEnabled = ts.IsOn;
-                ViewModel.StatusMessage = $"MCP 伺服器 '{server.Name}' 已{(server.IsEnabled ? "連線啟用" : "中斷連線")}";
-            }
-        }
-
-        private async void BtnAddMcpServer_Click(object sender, RoutedEventArgs e)
-        {
-            var txtName = new TextBox { Header = "伺服器名稱", PlaceholderText = "例如: sqlite-server" };
-            var txtCmd = new TextBox { Header = "執行命令", PlaceholderText = "例如: npx, python, uvx" };
-            var txtArgs = new TextBox { Header = "執行參數", PlaceholderText = "例如: -y @modelcontextprotocol/server-sqlite" };
-
-            var stack = new StackPanel
-            {
-                Spacing = 10,
-                Children = { txtName, txtCmd, txtArgs }
-            };
-
-            var dialog = new ContentDialog
-            {
-                Title = "新增自訂 MCP 伺服器",
-                Content = stack,
-                PrimaryButtonText = "新增",
-                CloseButtonText = "取消",
-                DefaultButton = ContentDialogButton.Primary,
-                XamlRoot = this.Content.XamlRoot
-            };
-
-            var result = await dialog.ShowAsync();
-            if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(txtName.Text))
-            {
-                var newServer = new McpServerConfig
-                {
-                    Name = txtName.Text.Trim(),
-                    Command = string.IsNullOrWhiteSpace(txtCmd.Text) ? "npx" : txtCmd.Text.Trim(),
-                    Arguments = txtArgs.Text.Trim(),
-                    IsEnabled = true,
-                    StatusColor = "#10B981"
-                };
-                newServer.Tools.Add(new McpToolItem { Name = "custom_tool", Description = "自訂 MCP 工具介面" });
-                ViewModel.McpServers.Add(newServer);
-                ViewModel.StatusMessage = $"已成功新增 MCP 伺服器: {newServer.Name}";
-            }
-        }
-
-        private void PluginToggle_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (sender is ToggleSwitch ts && ts.Tag is PluginItem plugin)
-            {
-                plugin.IsEnabled = ts.IsOn;
-                ViewModel.StatusMessage = $"外掛模組 '{plugin.Name}' 已{(plugin.IsEnabled ? "啟用" : "停用")}";
-            }
-        }
-
-        #endregion
-
         private async void BtnRunPython_Click(object sender, RoutedEventArgs e)
         {
             if (ViewModel.SelectedTab != null)
@@ -1146,7 +902,7 @@ namespace 程式IDE
                     Command = string.IsNullOrWhiteSpace(txtCmd.Text) ? "npx" : txtCmd.Text.Trim(),
                     Arguments = txtArgs.Text.Trim(),
                     IsEnabled = true,
-                    StatusColor = "#10B981"
+                    Status = "已連線"
                 };
                 newServer.Tools.Add(new McpToolItem { Name = "custom_tool", Description = "自訂 MCP 工具介面" });
                 ViewModel.McpServers.Add(newServer);
@@ -1258,67 +1014,6 @@ namespace 程式IDE
 
         #endregion
 
-        #region MCP & Plugin Handlers
-
-        private void McpServerToggle_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (sender is ToggleSwitch ts && ts.Tag is McpServerConfig server)
-            {
-                server.IsEnabled = ts.IsOn;
-                ViewModel.StatusMessage = $"MCP 伺服器 '{server.Name}' 已{(server.IsEnabled ? "連線啟用" : "中斷連線")}";
-            }
-        }
-
-        private async void BtnAddMcpServer_Click(object sender, RoutedEventArgs e)
-        {
-            var txtName = new TextBox { Header = "伺服器名稱", PlaceholderText = "例如: sqlite-server" };
-            var txtCmd = new TextBox { Header = "執行命令", PlaceholderText = "例如: npx, python, uvx" };
-            var txtArgs = new TextBox { Header = "執行參數", PlaceholderText = "例如: -y @modelcontextprotocol/server-sqlite" };
-
-            var stack = new StackPanel
-            {
-                Spacing = 10,
-                Children = { txtName, txtCmd, txtArgs }
-            };
-
-            var dialog = new ContentDialog
-            {
-                Title = "新增自訂 MCP 伺服器",
-                Content = stack,
-                PrimaryButtonText = "新增",
-                CloseButtonText = "取消",
-                DefaultButton = ContentDialogButton.Primary,
-                XamlRoot = this.Content.XamlRoot
-            };
-
-            var result = await dialog.ShowAsync();
-            if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(txtName.Text))
-            {
-                var newServer = new McpServerConfig
-                {
-                    Name = txtName.Text.Trim(),
-                    Command = string.IsNullOrWhiteSpace(txtCmd.Text) ? "npx" : txtCmd.Text.Trim(),
-                    Arguments = txtArgs.Text.Trim(),
-                    IsEnabled = true,
-                    StatusColor = "#10B981"
-                };
-                newServer.Tools.Add(new McpToolItem { Name = "custom_tool", Description = "自訂 MCP 工具介面" });
-                ViewModel.McpServers.Add(newServer);
-                ViewModel.StatusMessage = $"已成功新增 MCP 伺服器: {newServer.Name}";
-            }
-        }
-
-        private void PluginToggle_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (sender is ToggleSwitch ts && ts.Tag is PluginItem plugin)
-            {
-                plugin.IsEnabled = ts.IsOn;
-                ViewModel.StatusMessage = $"外掛模組 '{plugin.Name}' 已{(plugin.IsEnabled ? "啟用" : "停用")}";
-            }
-        }
-
-        #endregion
-
         #region Bottom Panel Handlers
 
         private void BtnTabOutput_Click(object sender, RoutedEventArgs e)
@@ -1361,66 +1056,6 @@ namespace 程式IDE
 
         #endregion
 
-        #region MCP & Plugin Handlers
-
-        private void McpServerToggle_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (sender is ToggleSwitch ts && ts.Tag is McpServerConfig server)
-            {
-                server.IsEnabled = ts.IsOn;
-                ViewModel.StatusMessage = $"MCP 伺服器 '{server.Name}' 已{(server.IsEnabled ? "連線啟用" : "中斷連線")}";
-            }
-        }
-
-        private async void BtnAddMcpServer_Click(object sender, RoutedEventArgs e)
-        {
-            var txtName = new TextBox { Header = "伺服器名稱", PlaceholderText = "例如: sqlite-server" };
-            var txtCmd = new TextBox { Header = "執行命令", PlaceholderText = "例如: npx, python, uvx" };
-            var txtArgs = new TextBox { Header = "執行參數", PlaceholderText = "例如: -y @modelcontextprotocol/server-sqlite" };
-
-            var stack = new StackPanel
-            {
-                Spacing = 10,
-                Children = { txtName, txtCmd, txtArgs }
-            };
-
-            var dialog = new ContentDialog
-            {
-                Title = "新增自訂 MCP 伺服器",
-                Content = stack,
-                PrimaryButtonText = "新增",
-                CloseButtonText = "取消",
-                DefaultButton = ContentDialogButton.Primary,
-                XamlRoot = this.Content.XamlRoot
-            };
-
-            var result = await dialog.ShowAsync();
-            if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(txtName.Text))
-            {
-                var newServer = new McpServerConfig
-                {
-                    Name = txtName.Text.Trim(),
-                    Command = string.IsNullOrWhiteSpace(txtCmd.Text) ? "npx" : txtCmd.Text.Trim(),
-                    Arguments = txtArgs.Text.Trim(),
-                    IsEnabled = true,
-                    StatusColor = "#10B981"
-                };
-                newServer.Tools.Add(new McpToolItem { Name = "custom_tool", Description = "自訂 MCP 工具介面" });
-                ViewModel.McpServers.Add(newServer);
-                ViewModel.StatusMessage = $"已成功新增 MCP 伺服器: {newServer.Name}";
-            }
-        }
-
-        private void PluginToggle_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (sender is ToggleSwitch ts && ts.Tag is PluginItem plugin)
-            {
-                plugin.IsEnabled = ts.IsOn;
-                ViewModel.StatusMessage = $"外掛模組 '{plugin.Name}' 已{(plugin.IsEnabled ? "啟用" : "停用")}";
-            }
-        }
-
-        #endregion
     }
 }
 

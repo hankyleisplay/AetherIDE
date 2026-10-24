@@ -1,5 +1,5 @@
 ﻿param (
-    [string]$CommitMessage = "feat: add MCP server center, plugin extension system, rich autocompletion, and fix light mode theme sync"
+    [string]$CommitMessage = "fix: resolve duplicate MainWindow member definitions and StatusColor readonly assignment"
 )
 
 $ErrorActionPreference = "Stop"
@@ -91,7 +91,7 @@ git branch -M main
 git add .
 $status = git status --porcelain
 if ($status) {
-    git commit -m "feat(release): $CommitMessage [$newTag]"
+    git commit -m "fix(release): $CommitMessage [$newTag]"
 } else {
     Write-Host "無額外檔案變更需要 commit。" -ForegroundColor Gray
 }
@@ -108,13 +108,11 @@ Write-Host "--> 正在建立 GitHub Release: $newTag..." -ForegroundColor Yellow
 $releaseLines = @(
     "## AetherIDE $newTag 發行說明",
     "",
-    "主要新功能與改進：",
-    "- 🔌 MCP 伺服器中心 (Model Context Protocol)：內建檔案系統、網絡擷取與記憶體圖譜 MCP 連線，支援一鍵新增自訂命令與參數，擴展 AI 工具調用能力。",
-    "- 🧩 外掛模組擴充體系 (Plugin Management)：支援模組開關控制，預裝程式碼排版 (Prettier)、GitLens、彩虹括號、Markdown 即時預覽、Aether Copilot Plus 與 REST Client。",
-    "- 💡 豐富程式碼自動補全 (IntelliSense)：Monaco 核心整合 C#、Python、JavaScript 智慧提示與關鍵字/方法片段即時補全。",
-    "- 🎨 淺色模式 UI 體驗優化：將執行按鈕調整為高對比度翠綠色 (#15803D)，大幅提升辨識度；徹底解決由調色盤或切換主題後，偏好設定 RadioButtons 未同步導致切換分頁又變回深色的問題。",
-    "- 🚀 快捷調色盤選單：頂部標題列調色盤支援深色 (VS Dark)、淺色 (VS Light)、賽博龐克紫 (Cyberpunk) 與深海藍 (Ocean Blue)。",
-    "- 🛡️ 行尾結束符號標準化：配置 .gitattributes 並全面標準化 CRLF，徹底消除 Visual Studio 開啟時的不一致行尾對話框提示。",
+    "主要修復與優化：",
+    "- 🛠️ 消除重複成員定義：清理 `MainWindow.xaml.cs` 中重複的事件處理器定義（`BtnAddMcpServer_Click`、`McpServerToggle_Toggled`、`PluginToggle_Toggled`）。",
+    "- 🎨 修復唯讀屬性指派：將自訂 MCP 伺服器建立時的狀態指派修正為 `Status = '已連線'`，正確觸發 `StatusColor` 唯讀通知。",
+    "- 🚀 編譯驗證通過：Visual Studio 與 dotnet CLI 達成 0 個警告、0 個錯誤穩定編譯。",
+    "- 🔌 完整保留 MCP 伺服器中心、外掛模組管理員、Monaco 智慧補全及淺色模式高對比與設定同步修復。",
     "",
     "下載說明：",
     "下載解壓縮下方 AetherIDE-$newTag-win-x64.zip 即可免安裝直接啟動 AetherIDE.exe！"
