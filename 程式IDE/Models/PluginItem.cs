@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace 程式IDE.Models
 {
@@ -56,8 +56,16 @@ namespace 程式IDE.Models
                 {
                     OnPropertyChanged(nameof(StatusText));
                     OnPropertyChanged(nameof(StatusColor));
+                    OnPropertyChanged(nameof(ActionEnabled));
                 }
             }
+        }
+
+        private bool _isInstalled = true;
+        public bool IsInstalled
+        {
+            get => _isInstalled;
+            set => SetProperty(ref _isInstalled, value);
         }
 
         private string _iconGlyph = "\uEA86";
@@ -74,6 +82,49 @@ namespace 程式IDE.Models
             set => SetProperty(ref _iconColor, value);
         }
 
+        private string _actionTitle = "執行操作";
+        public string ActionTitle
+        {
+            get => _actionTitle;
+            set => SetProperty(ref _actionTitle, value);
+        }
+
+        private string _actionGlyph = "\uE768";
+        public string ActionGlyph
+        {
+            get => _actionGlyph;
+            set => SetProperty(ref _actionGlyph, value);
+        }
+
+        private string _actionTooltip = string.Empty;
+        public string ActionTooltip
+        {
+            get => _actionTooltip;
+            set => SetProperty(ref _actionTooltip, value);
+        }
+
+        private string _downloads = "10K+";
+        public string Downloads
+        {
+            get => _downloads;
+            set => SetProperty(ref _downloads, value);
+        }
+
+        private string _rating = "★ 4.8";
+        public string Rating
+        {
+            get => _rating;
+            set => SetProperty(ref _rating, value);
+        }
+
+        private string _settingsSummary = string.Empty;
+        public string SettingsSummary
+        {
+            get => _settingsSummary;
+            set => SetProperty(ref _settingsSummary, value);
+        }
+
+        public bool ActionEnabled => IsEnabled && IsInstalled;
         public string StatusText => IsEnabled ? "已啟用" : "已停用";
         public string StatusColor => IsEnabled ? "#107C41" : "#888888";
     }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -268,6 +268,19 @@ namespace 程式IDE.ViewModels
 
         public ObservableCollection<McpServerConfig> McpServers => McpService.Servers;
         public ObservableCollection<PluginItem> InstalledPlugins => PluginService.InstalledPlugins;
+        public ObservableCollection<PluginItem> MarketplacePlugins => PluginService.MarketplacePlugins;
+
+        public event Action? RequestPrettierFormat;
+        public event Action? RequestToggleGitLens;
+        public event Action? RequestToggleRainbowBrackets;
+        public event Action? RequestMarkdownPreview;
+
+        private string _pluginSearchQuery = string.Empty;
+        public string PluginSearchQuery
+        {
+            get => _pluginSearchQuery;
+            set => SetProperty(ref _pluginSearchQuery, value);
+        }
 
         public void ToggleMcpServer(McpServerConfig server)
         {
@@ -279,6 +292,62 @@ namespace 程式IDE.ViewModels
         {
             PluginService.TogglePlugin(plugin);
             StatusMessage = $"外掛模組 '{plugin.Name}' {plugin.StatusText}";
+        }
+
+        public void InstallPlugin(PluginItem plugin)
+        {
+            PluginService.InstallPlugin(plugin);
+            StatusMessage = $"已成功安裝外掛模組: {plugin.Name}";
+        }
+
+        public void UninstallPlugin(PluginItem plugin)
+        {
+            PluginService.UninstallPlugin(plugin);
+            StatusMessage = $"已解除安裝外掛模組: {plugin.Name}";
+        }
+
+        public void TriggerPluginAction(PluginItem plugin)
+        {
+            switch (plugin.Id)
+            {
+                case "prettier-formatter":
+                    RequestPrettierFormat?.Invoke();
+                    StatusMessage = "[Prettier] 正在執行檔案美化排版...";
+                    break;
+
+                case "git-lens-pro":
+                    RequestToggleGitLens?.Invoke();
+                    StatusMessage = "[GitLens] 已切換行級提交者與時間歷史標註";
+                    break;
+
+                case "rainbow-brackets":
+                    RequestToggleRainbowBrackets?.Invoke();
+                    StatusMessage = "[Rainbow Brackets] 已切換彩虹括號色彩";
+                    break;
+
+                case "markdown-preview":
+                    RequestMarkdownPreview?.Invoke();
+                    StatusMessage = "[Markdown Preview] 已開啟即時渲染預覽視窗";
+                    break;
+
+                case "aether-copilot-plus":
+                    IsSidebarOpen = true;
+                    SelectedSidebarIndex = 2; // AI Assistant
+                    AiPrompt = "請針對目前的程式碼提供深入的結構解析、潛在邏輯審查與最佳化建議。";
+                    _ = AskAiAsync();
+                    StatusMessage = "[Aether Copilot] 已呼叫 AI 智慧助理";
+                    break;
+
+                case "rest-client":
+                    IsBottomPanelOpen = true;
+                    SelectedBottomPanelIndex = 3; // REST Client Tab
+                    StatusMessage = "[REST Client] 已切換至 API 測試控制台";
+                    break;
+
+                default:
+                    StatusMessage = $"已觸發外掛操作: {plugin.Name}";
+                    break;
+            }
         }
 
         #endregion
@@ -597,6 +666,125 @@ namespace 程式IDE.ViewModels
         {
             get => _statusMessage;
             set => SetProperty(ref _statusMessage, value);
+        }
+
+        #endregion
+
+        #region REST Client (API Debugger)
+
+        private string _restMethod = "GET";
+        public string RestMethod
+        {
+            get => _restMethod;
+            set => SetProperty(ref _restMethod, value);
+        }
+
+        private string _restUrl = "https://api.github.com/zen";
+        public string RestUrl
+        {
+            get => _restUrl;
+            set => SetProperty(ref _restUrl, value);
+        }
+
+        private string _restRequestBody = "{\n  \"client\": \"AetherIDE\",\n  \"version\": \"1.0.5\"\n}";
+        public string RestRequestBody
+        {
+            get => _restRequestBody;
+            set => SetProperty(ref _restRequestBody, value);
+        }
+
+        private string _restResponseStatus = "";
+        public string RestResponseStatus
+        {
+            get => _restResponseStatus;
+            set => SetProperty(ref _restResponseStatus, value);
+        }
+
+        private string _restResponseTime = "";
+        public string RestResponseTime
+        {
+            get => _restResponseTime;
+            set => SetProperty(ref _restResponseTime, value);
+        }
+
+        private string _restResponseBody = "";
+        public string RestResponseBody
+        {
+            get => _restResponseBody;
+            set => SetProperty(ref _restResponseBody, value);
+        }
+
+        private bool _isRestSending;
+        public bool IsRestSending
+        {
+            get => _isRestSending;
+            set => SetProperty(ref _isRestSending, value);
+        }
+
+        public async Task SendRestRequestAsync()
+        {
+            if (string.IsNullOrWhiteSpace(RestUrl))
+            {
+                StatusMessage = "請輸入有效的 API 網址";
+                return;
+            }
+
+            IsRestSending = true;
+            RestResponseStatus = "發送中...";
+            RestResponseTime = "";
+            RestResponseBody = "";
+
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+            try
+            {
+                using var client = new System.Net.Http.HttpClient();
+                client.DefaultRequestHeaders.Add("User-Agent", "AetherIDE-RestClient/1.0.5");
+
+                var request = new System.Net.Http.HttpRequestMessage
+                {
+                    Method = new System.Net.Http.HttpMethod(RestMethod.ToUpper()),
+                    RequestUri = new Uri(RestUrl.Trim())
+                };
+
+                if (RestMethod.ToUpper() != "GET" && !string.IsNullOrWhiteSpace(RestRequestBody))
+                {
+                    request.Content = new System.Net.Http.StringContent(RestRequestBody, System.Text.Encoding.UTF8, "application/json");
+                }
+
+                var response = await client.SendAsync(request);
+                stopwatch.Stop();
+
+                RestResponseTime = $"耗時: {stopwatch.ElapsedMilliseconds} ms";
+                RestResponseStatus = $"{(int)response.StatusCode} {response.ReasonPhrase}";
+
+                string rawBody = await response.Content.ReadAsStringAsync();
+
+                // Format JSON if possible
+                try
+                {
+                    using var doc = System.Text.Json.JsonDocument.Parse(rawBody);
+                    RestResponseBody = System.Text.Json.JsonSerializer.Serialize(doc.RootElement, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+                }
+                catch
+                {
+                    RestResponseBody = rawBody;
+                }
+
+                StatusMessage = $"REST 請求成功完成: {RestResponseStatus} ({RestResponseTime})";
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                RestResponseTime = $"耗時: {stopwatch.ElapsedMilliseconds} ms";
+                RestResponseStatus = "請求失敗 (Error)";
+                RestResponseBody = $"錯誤詳細資訊:\n{ex.Message}\n\n{ex.StackTrace}";
+                StatusMessage = $"REST 請求失敗: {ex.Message}";
+            }
+            finally
+            {
+                IsRestSending = false;
+            }
         }
 
         #endregion

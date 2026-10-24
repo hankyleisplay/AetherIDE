@@ -1,5 +1,5 @@
 ﻿param (
-    [string]$CommitMessage = "fix: resolve duplicate MainWindow member definitions and StatusColor readonly assignment"
+    [string]$CommitMessage = "feat: redesign MCP server cards layout, full interactive plugin system with marketplace, REST client and live markdown preview"
 )
 
 $ErrorActionPreference = "Stop"
@@ -91,7 +91,7 @@ git branch -M main
 git add .
 $status = git status --porcelain
 if ($status) {
-    git commit -m "fix(release): $CommitMessage [$newTag]"
+    git commit -m "feat(release): $CommitMessage [$newTag]"
 } else {
     Write-Host "無額外檔案變更需要 commit。" -ForegroundColor Gray
 }
@@ -108,11 +108,18 @@ Write-Host "--> 正在建立 GitHub Release: $newTag..." -ForegroundColor Yellow
 $releaseLines = @(
     "## AetherIDE $newTag 發行說明",
     "",
-    "主要修復與優化：",
-    "- 🛠️ 消除重複成員定義：清理 `MainWindow.xaml.cs` 中重複的事件處理器定義（`BtnAddMcpServer_Click`、`McpServerToggle_Toggled`、`PluginToggle_Toggled`）。",
-    "- 🎨 修復唯讀屬性指派：將自訂 MCP 伺服器建立時的狀態指派修正為 `Status = '已連線'`，正確觸發 `StatusColor` 唯讀通知。",
-    "- 🚀 編譯驗證通過：Visual Studio 與 dotnet CLI 達成 0 個警告、0 個錯誤穩定編譯。",
-    "- 🔌 完整保留 MCP 伺服器中心、外掛模組管理員、Monaco 智慧補全及淺色模式高對比與設定同步修復。",
+    "主要新功能與改進：",
+    "- 🔌 徹底解決 MCP Server 開關文字裁切問題：將側邊欄寬度適配至 340px，並優化 ToggleSwitch 緊湊佈局與狀態膠囊標籤，名稱與狀態文字 100% 完整清晰呈現。",
+    "- ⚡ MCP 伺服器中心全面互動升級：新增「測試連線 (Ping)」模擬延遲檢測、「檢視工具」彈出式完整工具參數檢視器與「刪除」自訂伺服器功能。",
+    "- 🧩 全功能實作外掛模組擴充體系 (Plugin Hub)：告別純圖示展示，每個已安裝外掛皆配備一鍵執行的核心功能按鈕：",
+    "  * ⚡ Prettier：直接一鍵排版美化當前檔案（支援 JSON/JS/TS/HTML/CSS 等多語言）。",
+    "  * 👁️ GitLens：切換編輯器行尾提交者（Author）與相對時間幽靈標註，即時掌握行級版本歷史。",
+    "  * 🌈 Rainbow Brackets：動態切換 Monaco 核心彩虹多重漸層配對括號高亮與對齊引導線。",
+    "  * 📑 Markdown Preview：一鍵開啟左右雙向即時渲染預覽分欄，支援 GitHub GFM 樣式與代碼高亮。",
+    "  * 🤖 Aether Copilot：即時調用 AI 助理進行深層代碼解析、測試生成與重構建議。",
+    "  * 🌐 REST Client：一鍵切換底部 API 測試工作台，即時發送 HTTP 請求與格式化 JSON 回應。",
+    "- 🛒 外掛市集 (Marketplace) 與一鍵安裝：新增市集分頁，收錄 Python Black、ESLint、Docker Tools、Color Highlight、TODO Highlight 等熱門套件，支援一鍵安裝與自訂本機外掛載入。",
+    "- 🌐 底部控制台新增 REST Client API 測試套件：支援 GET/POST/PUT/DELETE/PATCH 方法、自訂 Payload 與即時回應狀態碼、耗時、格式化 JSON 檢視。",
     "",
     "下載說明：",
     "下載解壓縮下方 AetherIDE-$newTag-win-x64.zip 即可免安裝直接啟動 AetherIDE.exe！"

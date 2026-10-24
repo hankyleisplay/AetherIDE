@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Window
     x:Class="程式IDE.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -236,7 +236,7 @@
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="48" />   <!-- Activity Bar -->
-                <ColumnDefinition Width="280" MinWidth="180" MaxWidth="500" x:Name="SidebarColumn" /> <!-- Sidebar -->
+                <ColumnDefinition Width="340" MinWidth="240" MaxWidth="600" x:Name="SidebarColumn" /> <!-- Sidebar -->
                 <ColumnDefinition Width="4" />    <!-- Splitter -->
                 <ColumnDefinition Width="*" />    <!-- Main Editor & Bottom Area -->
             </Grid.ColumnDefinitions>
@@ -531,38 +531,74 @@
                         </Grid.RowDefinitions>
 
                         <StackPanel Grid.Row="0" Spacing="4" Margin="0,0,0,8">
-                            <TextBlock Text="Model Context Protocol (MCP)" FontSize="13" FontWeight="SemiBold" />
-                            <TextBlock Text="連線本機或遠端 MCP 伺服器，賦予 Aether AI 工具調用與資料庫操作能力。" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                            <TextBlock Text="Model Context Protocol (MCP) 中心" FontSize="13" FontWeight="SemiBold" />
+                            <TextBlock Text="連線本機與遠端 MCP 伺服器，直接賦予 Aether AI 工具調用與上下文記憶能力。" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
                         </StackPanel>
 
                         <ListView Grid.Row="1" ItemsSource="{x:Bind ViewModel.McpServers, Mode=OneWay}">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="models:McpServerConfig">
-                                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,4">
-                                        <StackPanel Spacing="6">
+                                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,5">
+                                        <StackPanel Spacing="8">
+                                            <!-- Header row: Status Dot, Server Name, Status Pill, compact ToggleSwitch -->
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
-                                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                                                    <Ellipse Width="8" Height="8" Fill="{x:Bind StatusColor, Mode=OneWay}" />
-                                                    <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" FontSize="12" />
+
+                                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                                    <Ellipse Width="8" Height="8" Fill="{x:Bind StatusColor, Mode=OneWay}" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{x:Bind Name}" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                                    <Border Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="4" Padding="4,1" VerticalAlignment="Center">
+                                                        <TextBlock Text="{x:Bind Status, Mode=OneWay}" FontSize="9" Foreground="{x:Bind StatusColor, Mode=OneWay}" FontWeight="SemiBold" />
+                                                    </Border>
                                                 </StackPanel>
-                                                <ToggleSwitch Grid.Column="1" IsOn="{x:Bind IsEnabled, Mode=TwoWay}" Toggled="McpServerToggle_Toggled" Tag="{x:Bind}" HorizontalAlignment="Right" OnContent="" OffContent="" />
+
+                                                <ToggleSwitch Grid.Column="1"
+                                                              IsOn="{x:Bind IsEnabled, Mode=TwoWay}"
+                                                              Toggled="McpServerToggle_Toggled"
+                                                              Tag="{x:Bind}"
+                                                              MinWidth="0"
+                                                              Padding="0"
+                                                              Margin="4,0,0,0"
+                                                              HorizontalAlignment="Right"
+                                                              VerticalAlignment="Center"
+                                                              OnContent=""
+                                                              OffContent="" />
                                             </Grid>
 
-                                            <TextBlock Text="{x:Bind Command}" FontFamily="Cascadia Code, Consolas" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                            <TextBlock Text="{x:Bind Arguments}" FontFamily="Cascadia Code, Consolas" FontSize="10" Foreground="{ThemeResource TextFillColorTertiaryBrush}" TextWrapping="Wrap" />
+                                            <!-- Command line badge -->
+                                            <Border Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="4" Padding="6,4">
+                                                <TextBlock FontFamily="Cascadia Code, Consolas" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap">
+                                                    <Run Text="{x:Bind Command}" FontWeight="SemiBold" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                                    <Run Text=" " />
+                                                    <Run Text="{x:Bind Arguments}" />
+                                                </TextBlock>
+                                            </Border>
 
-                                            <Border Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="4" Padding="6,3" Margin="0,2,0,0">
-                                                <StackPanel Orientation="Horizontal" Spacing="4">
-                                                    <FontIcon Glyph="&#xE756;" FontSize="10" />
-                                                    <TextBlock Text="可用工具：" FontSize="10" FontWeight="SemiBold" />
-                                                    <TextBlock Text="{x:Bind ToolsCount, Mode=OneWay}" FontSize="10" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                            <!-- Action row: Tools count, Test Ping Button, Inspect Tools Button, Delete Button -->
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                                    <FontIcon Glyph="&#xE756;" FontSize="10" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                                    <TextBlock Text="可用工具：" FontSize="10" />
+                                                    <TextBlock Text="{x:Bind ToolsCount, Mode=OneWay}" FontSize="10" FontWeight="Bold" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
                                                     <TextBlock Text="個" FontSize="10" />
                                                 </StackPanel>
-                                            </Border>
+
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                                    <Button Content="測試連線" FontSize="10" Padding="6,2" CornerRadius="4" Click="BtnTestMcpServer_Click" Tag="{x:Bind}" ToolTipService.ToolTip="測試 MCP 伺服器通訊回應" />
+                                                    <Button Content="檢視工具" FontSize="10" Padding="6,2" CornerRadius="4" Click="BtnInspectMcpTools_Click" Tag="{x:Bind}" ToolTipService.ToolTip="查看此伺服器公開的所有工具清單" />
+                                                    <Button ToolTipService.ToolTip="刪除此 MCP 伺服器" Click="BtnDeleteMcpServer_Click" Tag="{x:Bind}" Padding="5,2" CornerRadius="4" Background="Transparent" BorderThickness="0">
+                                                        <FontIcon Glyph="&#xE74D;" FontSize="11" Foreground="{ThemeResource SystemFillColorCriticalBackgroundBrush}" />
+                                                    </Button>
+                                                </StackPanel>
+                                            </Grid>
                                         </StackPanel>
                                     </Border>
                                 </DataTemplate>
@@ -576,49 +612,157 @@
                     <Grid x:Name="ViewPlugins" Visibility="Collapsed" Margin="12,4">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
+                        <!-- Title and description -->
                         <StackPanel Grid.Row="0" Spacing="4" Margin="0,0,0,8">
-                            <TextBlock Text="已安裝外掛模組" FontSize="13" FontWeight="SemiBold" />
-                            <TextBlock Text="擴充 AetherIDE 的語法檢查、排版與版本控制能力。" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Text="外掛模組擴充體系 (Extensions)" FontSize="13" FontWeight="SemiBold" />
+                            <TextBlock Text="擴充 AetherIDE 的語法高亮、版本控制、文檔預覽與 API 測試能力。" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
                         </StackPanel>
 
-                        <ListView Grid.Row="1" ItemsSource="{x:Bind ViewModel.InstalledPlugins, Mode=OneWay}">
-                            <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="models:PluginItem">
-                                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,4">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
+                        <!-- Segmented Navigation: Installed vs Marketplace -->
+                        <Grid Grid.Row="1" Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="BtnPluginsTabInstalled" Content="已安裝外掛 (Installed)" Click="BtnPluginsTabInstalled_Click" HorizontalAlignment="Stretch" Margin="0,0,2,0" FontWeight="SemiBold" />
+                            <Button x:Name="BtnPluginsTabMarketplace" Grid.Column="1" Content="外掛市集 (Marketplace)" Click="BtnPluginsTabMarketplace_Click" HorizontalAlignment="Stretch" Margin="2,0,0,0" />
+                        </Grid>
 
-                                            <!-- Plugin Icon -->
-                                            <Border Grid.Column="0" Width="36" Height="36" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Margin="0,0,10,0">
-                                                <FontIcon Glyph="{x:Bind IconGlyph}" FontSize="18" Foreground="{x:Bind IconColor}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                            </Border>
+                        <!-- View 1: Installed Plugins List -->
+                        <Grid x:Name="InstalledPluginsPanel" Grid.Row="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
 
-                                            <!-- Plugin Info -->
-                                            <StackPanel Grid.Column="1" Spacing="3">
-                                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                                    <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" FontSize="12" />
-                                                    <Border Background="{ThemeResource SystemFillColorNeutralBackgroundBrush}" CornerRadius="3" Padding="4,1">
-                                                        <TextBlock Text="{x:Bind Version}" FontSize="9" />
+                            <ListView Grid.Row="0" ItemsSource="{x:Bind ViewModel.InstalledPlugins, Mode=OneWay}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:PluginItem">
+                                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,5">
+                                            <StackPanel Spacing="8">
+                                                <!-- Top Row: Icon, Name, Version, Status, ToggleSwitch -->
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- Icon -->
+                                                    <Border Grid.Column="0" Width="36" Height="36" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Margin="0,0,10,0">
+                                                        <FontIcon Glyph="{x:Bind IconGlyph}" FontSize="18" Foreground="{x:Bind IconColor}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                                     </Border>
-                                                </StackPanel>
-                                                <TextBlock Text="{x:Bind Description}" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
-                                                <TextBlock Text="{x:Bind Author}" FontSize="10" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
-                                            </StackPanel>
 
-                                            <!-- Toggle Switch -->
-                                            <ToggleSwitch Grid.Column="2" IsOn="{x:Bind IsEnabled, Mode=TwoWay}" Toggled="PluginToggle_Toggled" Tag="{x:Bind}" HorizontalAlignment="Right" OnContent="" OffContent="" Margin="6,0,0,0" />
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
+                                                    <!-- Name & Details -->
+                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                                            <TextBlock Text="{x:Bind Name}" FontWeight="Bold" FontSize="12" TextWrapping="Wrap" />
+                                                            <Border Background="{ThemeResource SystemFillColorNeutralBackgroundBrush}" CornerRadius="3" Padding="3,1">
+                                                                <TextBlock Text="{x:Bind Version}" FontSize="9" />
+                                                            </Border>
+                                                        </StackPanel>
+                                                        <TextBlock Text="{x:Bind Author}" FontSize="10" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                                    </StackPanel>
+
+                                                    <!-- Toggle Switch -->
+                                                    <ToggleSwitch Grid.Column="2" IsOn="{x:Bind IsEnabled, Mode=TwoWay}" Toggled="PluginToggle_Toggled" Tag="{x:Bind}" MinWidth="0" Padding="0" Margin="4,0,0,0" HorizontalAlignment="Right" OnContent="" OffContent="" VerticalAlignment="Center" />
+                                                </Grid>
+
+                                                <!-- Description -->
+                                                <TextBlock Text="{x:Bind Description}" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+
+                                                <!-- Settings summary -->
+                                                <Border Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="4" Padding="6,3">
+                                                    <TextBlock Text="{x:Bind SettingsSummary}" FontSize="10" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                                </Border>
+
+                                                <!-- Action Buttons: PRIMARY USE BUTTON -->
+                                                <Grid Margin="0,2,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <Button Grid.Column="0"
+                                                            Style="{ThemeResource AccentButtonStyle}"
+                                                            HorizontalAlignment="Stretch"
+                                                            Padding="8,5"
+                                                            FontSize="11"
+                                                            Click="BtnPluginAction_Click"
+                                                            Tag="{x:Bind}"
+                                                            ToolTipService.ToolTip="{x:Bind ActionTooltip}">
+                                                        <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                                                            <FontIcon Glyph="{x:Bind ActionGlyph}" FontSize="11" />
+                                                            <TextBlock Text="{x:Bind ActionTitle}" FontWeight="SemiBold" />
+                                                        </StackPanel>
+                                                    </Button>
+
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" Margin="6,0,0,0">
+                                                        <Button ToolTipService.ToolTip="外掛詳細設定" Click="BtnPluginSettings_Click" Tag="{x:Bind}" Padding="6,5" CornerRadius="4">
+                                                            <FontIcon Glyph="&#xE713;" FontSize="11" />
+                                                        </Button>
+                                                        <Button ToolTipService.ToolTip="解除安裝此擴充" Click="BtnUninstallPlugin_Click" Tag="{x:Bind}" Padding="6,5" CornerRadius="4" Background="Transparent" BorderThickness="0">
+                                                            <FontIcon Glyph="&#xE74D;" FontSize="11" Foreground="{ThemeResource SystemFillColorCriticalBackgroundBrush}" />
+                                                        </Button>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+
+                            <!-- Bottom button: Install from file -->
+                            <Button Grid.Row="1" Content="+ 從本機檔案安裝外掛 (.json / .zip)..." HorizontalAlignment="Stretch" Margin="0,8,0,4" Click="BtnInstallFromFile_Click" />
+                        </Grid>
+
+                        <!-- View 2: Marketplace Plugins List -->
+                        <Grid x:Name="MarketplacePluginsPanel" Grid.Row="2" Visibility="Collapsed">
+                            <ListView ItemsSource="{x:Bind ViewModel.MarketplacePlugins, Mode=OneWay}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:PluginItem">
+                                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,5">
+                                            <StackPanel Spacing="6">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <Border Grid.Column="0" Width="36" Height="36" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Margin="0,0,10,0">
+                                                        <FontIcon Glyph="{x:Bind IconGlyph}" FontSize="18" Foreground="{x:Bind IconColor}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                    </Border>
+
+                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                                        <TextBlock Text="{x:Bind Name}" FontWeight="Bold" FontSize="12" TextWrapping="Wrap" />
+                                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                                            <TextBlock Text="{x:Bind Author}" FontSize="10" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                                            <TextBlock Text="•" FontSize="10" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                                            <TextBlock Text="{x:Bind Downloads}" FontSize="10" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                                            <TextBlock Text="•" FontSize="10" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                                            <TextBlock Text="{x:Bind Rating}" FontSize="10" Foreground="#F59E0B" />
+                                                        </StackPanel>
+                                                    </StackPanel>
+
+                                                    <Button Grid.Column="2" Content="安裝" Style="{ThemeResource AccentButtonStyle}" Padding="10,4" FontSize="11" Click="BtnInstallPlugin_Click" Tag="{x:Bind}" VerticalAlignment="Center" />
+                                                </Grid>
+
+                                                <TextBlock Text="{x:Bind Description}" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+
+                                                <Border Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left">
+                                                    <TextBlock Text="{x:Bind Category}" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                </Border>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Grid>
                     </Grid>
 
                     <!-- 7. Run & Tools View -->
@@ -737,16 +881,43 @@
                         </TabView.TabItemTemplate>
                     </TabView>
 
-                    <!-- Center Area: Monaco WebView2 or Welcome Screen -->
+                    <!-- Center Area: Monaco WebView2, Markdown Live Preview, or Welcome Screen -->
                     <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" x:Name="EditorColumn" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" x:Name="MarkdownPreviewColumn" MaxWidth="1000" />
+                        </Grid.ColumnDefinitions>
+
                         <!-- Monaco Code Editor Host (Visible when tabs exist) -->
                         <WebView2 x:Name="EditorWebView"
+                                  Grid.Column="0"
                                   Visibility="{x:Bind BoolToVisibility(ViewModel.HasOpenTabs), Mode=OneWay}"
                                   HorizontalAlignment="Stretch"
                                   VerticalAlignment="Stretch" />
 
+                        <!-- Splitter for Markdown Preview -->
+                        <sizers:GridSplitter Grid.Column="1" Width="4" x:Name="MarkdownSplitter" Visibility="Collapsed" />
+
+                        <!-- Markdown Live Preview Pane -->
+                        <Grid x:Name="MarkdownPreviewPane" Grid.Column="2" Visibility="Collapsed" Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1,0,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="36" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Padding="12,0" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="0,0,0,1">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="6">
+                                    <FontIcon Glyph="&#xE8A5;" FontSize="14" Foreground="#10B981" />
+                                    <TextBlock Text="Markdown 即時渲染預覽" FontWeight="SemiBold" FontSize="12" />
+                                </StackPanel>
+                                <Button Content="關閉預覽" HorizontalAlignment="Right" Padding="8,3" FontSize="11" Click="BtnCloseMarkdownPreview_Click" />
+                            </Grid>
+                            <WebView2 x:Name="MarkdownPreviewWebView" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                        </Grid>
+
                         <!-- Welcome Screen (Visible when NO tabs are open) -->
                         <Grid x:Name="WelcomeScreen"
+                              Grid.ColumnSpan="3"
                               Visibility="{x:Bind InverseBoolToVisibility(ViewModel.HasOpenTabs), Mode=OneWay}"
                               Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
                             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
@@ -871,6 +1042,7 @@
                                     </Border>
                                 </StackPanel>
                             </Button>
+                            <Button x:Name="BtnTabRestClient" Content="REST Client (API)" Click="BtnTabRestClient_Click" Padding="10,4" CornerRadius="4" FontSize="12" />
                         </StackPanel>
 
                         <!-- Right Actions -->
@@ -942,6 +1114,97 @@
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
+
+                        <!-- 4. REST Client Tab -->
+                        <Grid x:Name="RestClientGrid" Visibility="Collapsed" Padding="8">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <!-- Request Bar: Method, URL, Send Button -->
+                            <Grid Grid.Row="0" Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="110" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <ComboBox Grid.Column="0" SelectedValue="{x:Bind ViewModel.RestMethod, Mode=TwoWay}" HorizontalAlignment="Stretch" Margin="0,0,6,0">
+                                    <x:String>GET</x:String>
+                                    <x:String>POST</x:String>
+                                    <x:String>PUT</x:String>
+                                    <x:String>DELETE</x:String>
+                                    <x:String>PATCH</x:String>
+                                </ComboBox>
+
+                                <TextBox Grid.Column="1"
+                                         Text="{x:Bind ViewModel.RestUrl, Mode=TwoWay}"
+                                         PlaceholderText="輸入 API 端點 URL (例如: https://api.github.com/zen 或 https://httpbin.org/get)..."
+                                         FontFamily="Cascadia Code, Consolas"
+                                         FontSize="12"
+                                         VerticalAlignment="Center" />
+
+                                <Button Grid.Column="2"
+                                        Content="發送請求 (Send)"
+                                        Style="{ThemeResource AccentButtonStyle}"
+                                        Click="BtnSendRestRequest_Click"
+                                        Margin="6,0,0,0"
+                                        Padding="12,5"
+                                        VerticalAlignment="Center" />
+                            </Grid>
+
+                            <!-- Request Body & Response Split/Area -->
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="280" MinWidth="180" />
+                                    <ColumnDefinition Width="4" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Left: Request Body (JSON) -->
+                                <Border Grid.Column="0" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="6" Padding="8">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Text="請求內文 (JSON / Payload):" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,4" />
+                                        <TextBox Grid.Row="1"
+                                                 Text="{x:Bind ViewModel.RestRequestBody, Mode=TwoWay}"
+                                                 AcceptsReturn="True"
+                                                 FontFamily="Cascadia Code, Consolas"
+                                                 FontSize="11"
+                                                 BorderThickness="0"
+                                                 Background="Transparent" />
+                                    </Grid>
+                                </Border>
+
+                                <!-- Right: Response Status & Body -->
+                                <Border Grid.Column="2" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="6" Padding="8">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,4">
+                                            <TextBlock Text="回應結果 (Response):" FontSize="11" FontWeight="SemiBold" />
+                                            <TextBlock Text="{x:Bind ViewModel.RestResponseStatus, Mode=OneWay}" FontSize="11" Foreground="{ThemeResource AccentFillColorDefaultBrush}" FontWeight="Bold" />
+                                            <TextBlock Text="{x:Bind ViewModel.RestResponseTime, Mode=OneWay}" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        </StackPanel>
+                                        <TextBox Grid.Row="1"
+                                                 Text="{x:Bind ViewModel.RestResponseBody, Mode=OneWay}"
+                                                 IsReadOnly="True"
+                                                 AcceptsReturn="True"
+                                                 FontFamily="Cascadia Code, Consolas"
+                                                 FontSize="11"
+                                                 BorderThickness="0"
+                                                 Background="Transparent"
+                                                 PlaceholderText="點擊「發送請求」檢視伺服器回應..." />
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Grid>
                     </Grid>
                 </Grid>
             </Grid>
