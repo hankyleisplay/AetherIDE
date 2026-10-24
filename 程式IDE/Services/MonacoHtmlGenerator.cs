@@ -52,6 +52,61 @@ namespace 程式IDE.Services
       }
     }
 
+    function registerCustomAutocompletions() {
+      // 1. C# completions
+      monaco.languages.registerCompletionItemProvider('csharp', {
+        provideCompletionItems: function(model, position) {
+          var word = model.getWordUntilPosition(position);
+          var range = { startLineNumber: position.lineNumber, endLineNumber: position.lineNumber, startColumn: word.startColumn, endColumn: word.endColumn };
+          return {
+            suggestions: [
+              { label: 'Console.WriteLine', kind: monaco.languages.CompletionItemKind.Function, insertText: 'Console.WriteLine(${1:message});', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, detail: '輸出文字至主控台', range: range },
+              { label: 'async Task', kind: monaco.languages.CompletionItemKind.Snippet, insertText: 'public async Task ${1:MethodName}()\n{\n    ${2}\n}', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, detail: '非同步方法範本', range: range },
+              { label: 'prop', kind: monaco.languages.CompletionItemKind.Snippet, insertText: 'public ${1:string} ${2:MyProperty} { get; set; }', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, detail: '自動實作屬性', range: range },
+              { label: 'foreach', kind: monaco.languages.CompletionItemKind.Snippet, insertText: 'foreach (var ${1:item} in ${2:collection})\n{\n    ${3}\n}', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, detail: '走訪迴圈', range: range },
+              { label: 'try/catch', kind: monaco.languages.CompletionItemKind.Snippet, insertText: 'try\n{\n    ${1}\n}\ncatch (Exception ex)\n{\n    Console.WriteLine(ex.Message);\n}', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, detail: '例外處理區塊', range: range },
+              { label: 'record', kind: monaco.languages.CompletionItemKind.Snippet, insertText: 'public record ${1:RecordName}(${2:params});', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, detail: 'C# 記錄型別', range: range }
+            ]
+          };
+        }
+      });
+
+      // 2. Python completions
+      monaco.languages.registerCompletionItemProvider('python', {
+        provideCompletionItems: function(model, position) {
+          var word = model.getWordUntilPosition(position);
+          var range = { startLineNumber: position.lineNumber, endLineNumber: position.lineNumber, startColumn: word.startColumn, endColumn: word.endColumn };
+          return {
+            suggestions: [
+              { label: 'def', kind: monaco.languages.CompletionItemKind.Snippet, insertText: 'def ${1:function_name}(${2:params}):\n    ${3:pass}', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, detail: '函式定義', range: range },
+              { label: 'print', kind: monaco.languages.CompletionItemKind.Function, insertText: 'print(${1:message})', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, detail: '輸出訊息', range: range },
+              { label: 'main_entry', kind: monaco.languages.CompletionItemKind.Snippet, insertText: 'if __name__ == "__main__":\n    ${1:main()}', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, detail: '主程式進入點', range: range },
+              { label: 'class', kind: monaco.languages.CompletionItemKind.Snippet, insertText: 'class ${1:ClassName}:\n    def __init__(self${2:, args}):\n        ${3:pass}', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, detail: '類別範本', range: range },
+              { label: 'try/except', kind: monaco.languages.CompletionItemKind.Snippet, insertText: 'try:\n    ${1:pass}\nexcept Exception as e:\n    print(f"Error: {e}")', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, detail: '例外捕捉', range: range }
+            ]
+          };
+        }
+      });
+
+      // 3. JavaScript / TypeScript completions
+      var jsHandler = {
+        provideCompletionItems: function(model, position) {
+          var word = model.getWordUntilPosition(position);
+          var range = { startLineNumber: position.lineNumber, endLineNumber: position.lineNumber, startColumn: word.startColumn, endColumn: word.endColumn };
+          return {
+            suggestions: [
+              { label: 'console.log', kind: monaco.languages.CompletionItemKind.Function, insertText: 'console.log(${1:obj});', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, detail: '主控台輸出', range: range },
+              { label: 'async function', kind: monaco.languages.CompletionItemKind.Snippet, insertText: 'async function ${1:name}(${2}) {\n    ${3}\n}', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, detail: '非同步函式', range: range },
+              { label: 'fetch json', kind: monaco.languages.CompletionItemKind.Snippet, insertText: 'const res = await fetch("${1:url}");\nconst data = await res.json();', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, detail: '網路請求', range: range },
+              { label: 'arrow function', kind: monaco.languages.CompletionItemKind.Snippet, insertText: 'const ${1:fn} = (${2:args}) => {\n    ${3}\n};', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, detail: '箭頭函式', range: range }
+            ]
+          };
+        }
+      };
+      monaco.languages.registerCompletionItemProvider('javascript', jsHandler);
+      monaco.languages.registerCompletionItemProvider('typescript', jsHandler);
+    }
+
     function initMonaco() {
       if (typeof require !== 'undefined') {
         try {
@@ -94,6 +149,9 @@ namespace 程式IDE.Services
               }
             });
 
+            // Register rich custom completions
+            registerCustomAutocompletions();
+
             editor = monaco.editor.create(document.getElementById('editor'), {
               value: '',
               language: currentLanguage,
@@ -108,7 +166,15 @@ namespace 程式IDE.Services
               cursorBlinking: 'smooth',
               smoothScrolling: true,
               tabSize: 4,
-              renderWhitespace: 'selection'
+              renderWhitespace: 'selection',
+              quickSuggestions: { other: true, comments: true, strings: true },
+              suggestOnTriggerCharacters: true,
+              acceptSuggestionOnEnter: "on",
+              tabCompletion: "on",
+              parameterHints: { enabled: true },
+              autoClosingBrackets: "always",
+              autoClosingQuotes: "always",
+              autoSurround: "languageDefined"
             });
 
             editor.onDidChangeModelContent(() => {

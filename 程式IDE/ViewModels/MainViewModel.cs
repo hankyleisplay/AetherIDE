@@ -16,6 +16,8 @@ namespace 程式IDE.ViewModels
         private readonly FileService _fileService = new();
         private readonly ExecutionService _executionService = new();
         private readonly AiAssistantService _aiAssistantService = new();
+        public McpService McpService { get; } = new();
+        public PluginService PluginService { get; } = new();
         private DispatcherQueue? _dispatcherQueue;
 
         public MainViewModel()
@@ -110,7 +112,6 @@ namespace 程式IDE.ViewModels
         {
             if (!File.Exists(filePath)) return;
 
-            // Check if already open
             var existing = OpenTabs.FirstOrDefault(t => string.Equals(t.FilePath, filePath, StringComparison.OrdinalIgnoreCase));
             if (existing != null)
             {
@@ -243,7 +244,13 @@ namespace 程式IDE.ViewModels
                 currentCode = await RequestContentFromEditor.Invoke();
             }
 
-            string result = await _aiAssistantService.ProcessPromptAsync(prompt, currentCode, CurrentLanguage);
+            // Include connected MCP tools context
+            var activeTools = McpService.GetAllActiveTools();
+            string mcpInfo = activeTools.Count > 0
+                ? $"\n[已連線 MCP 工具: {string.Join(", ", activeTools.Select(t => t.Name))}]"
+                : "";
+
+            string result = await _aiAssistantService.ProcessPromptAsync(prompt + mcpInfo, currentCode, CurrentLanguage);
             AiResponse = result;
             IsAiProcessing = false;
             StatusMessage = "Aether AI 分析完成";
@@ -253,6 +260,25 @@ namespace 程式IDE.ViewModels
         {
             RequestInsertCodeToEditor?.Invoke(snippet.Code);
             StatusMessage = $"已插入範本: {snippet.Title}";
+        }
+
+        #endregion
+
+        #region MCP Servers & Plugins
+
+        public ObservableCollection<McpServerConfig> McpServers => McpService.Servers;
+        public ObservableCollection<PluginItem> InstalledPlugins => PluginService.InstalledPlugins;
+
+        public void ToggleMcpServer(McpServerConfig server)
+        {
+            McpService.ToggleServerStatus(server);
+            StatusMessage = $"MCP 伺服器 '{server.Name}' {server.Status}";
+        }
+
+        public void TogglePlugin(PluginItem plugin)
+        {
+            PluginService.TogglePlugin(plugin);
+            StatusMessage = $"外掛模組 '{plugin.Name}' {plugin.StatusText}";
         }
 
         #endregion
@@ -349,7 +375,6 @@ namespace 程式IDE.ViewModels
                 return;
             }
 
-            // Auto-save before running
             await SaveActiveFileAsync();
 
             if (string.IsNullOrEmpty(SelectedTab.FilePath))
@@ -358,7 +383,6 @@ namespace 程式IDE.ViewModels
                 return;
             }
 
-            // Open bottom panel and switch to Output tab
             IsBottomPanelOpen = true;
             SelectedBottomPanelIndex = 0;
 
@@ -460,7 +484,7 @@ namespace 程式IDE.ViewModels
 
         #region Navigation & Layout
 
-        private int _selectedSidebarIndex = 0; // 0: Explorer, 1: Search, 2: Run, 3: AI, 4: Snippets, 5: Settings
+        private int _selectedSidebarIndex = 0; // 0: Explorer, 1: Search, 2: AI, 3: Snippets, 4: MCP, 5: Plugins, 6: Run, 7: Settings
         public int SelectedSidebarIndex
         {
             get => _selectedSidebarIndex;

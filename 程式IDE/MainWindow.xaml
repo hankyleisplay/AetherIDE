@@ -55,13 +55,15 @@
             </Grid>
 
             <!-- Right Quick Action Bar (Independent Interactive Area) -->
-            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,148,0" Spacing="4">
-                <!-- Run Button -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,148,0" Spacing="5">
+                <!-- High-Contrast Run Button (Crisp Emerald Green in both Dark and Light modes) -->
                 <Button x:Name="BtnQuickRun"
                         ToolTipService.ToolTip="執行目前檔案 (F5)"
                         Click="BtnQuickRun_Click"
-                        Background="{ThemeResource SystemFillColorSuccessBackgroundBrush}"
-                        Padding="8,5"
+                        Background="#15803D"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Padding="10,5"
                         CornerRadius="4">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <FontIcon Glyph="&#xE768;" FontSize="12" Foreground="White" />
@@ -74,8 +76,10 @@
                         ToolTipService.ToolTip="終止執行 (Shift+F5)"
                         Click="BtnQuickStop_Click"
                         Visibility="{x:Bind BoolToVisibility(ViewModel.IsProcessRunning), Mode=OneWay}"
-                        Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}"
-                        Padding="8,5"
+                        Background="#DC2626"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Padding="10,5"
                         CornerRadius="4">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <FontIcon Glyph="&#xE71A;" FontSize="12" Foreground="White" />
@@ -83,7 +87,7 @@
                     </StackPanel>
                 </Button>
 
-                <!-- Format Code Button (Using document align icon) -->
+                <!-- Format Code Button -->
                 <Button ToolTipService.ToolTip="格式化程式碼 (Shift+Alt+F)" Click="MenuFormatDocument_Click" Padding="7,5" CornerRadius="4">
                     <FontIcon Glyph="&#xE8E4;" FontSize="13" />
                 </Button>
@@ -95,7 +99,7 @@
 
                 <!-- Theme Palette Button (Interactive DropDown with Palette Icon) -->
                 <DropDownButton x:Name="BtnThemePalette"
-                                ToolTipService.ToolTip="調色盤 (切換主題與配色風格)"
+                                ToolTipService.ToolTip="調色盤 (切換深色/淺色/個性化配色)"
                                 Padding="7,5"
                                 CornerRadius="4">
                     <FontIcon Glyph="&#xE790;" FontSize="14" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
@@ -202,6 +206,9 @@
                 <MenuFlyoutSeparator />
                 <ToggleMenuFlyoutItem Text="程式碼縮圖 (Minimap)" IsChecked="{x:Bind ViewModel.ShowMinimap, Mode=TwoWay}" Click="MenuToggleMinimap_Click" />
                 <ToggleMenuFlyoutItem Text="自動換行 (Word Wrap)" IsChecked="{x:Bind ViewModel.WordWrap, Mode=TwoWay}" Click="MenuToggleWordWrap_Click" />
+                <MenuFlyoutSeparator />
+                <MenuFlyoutItem Text="MCP 伺服器中心" Click="BtnNavMcp_Click" />
+                <MenuFlyoutItem Text="外掛模組管理員" Click="BtnNavPlugins_Click" />
             </MenuBarItem>
 
             <MenuBarItem Title="執行(R)">
@@ -281,6 +288,26 @@
                             Padding="0" HorizontalAlignment="Center"
                             Background="Transparent" BorderThickness="0" CornerRadius="6">
                         <FontIcon Glyph="&#xEA86;" FontSize="18" />
+                    </Button>
+
+                    <!-- MCP Servers -->
+                    <Button x:Name="BtnNavMcp"
+                            ToolTipService.ToolTip="Model Context Protocol (MCP) 伺服器中心"
+                            Click="BtnNavMcp_Click"
+                            Width="40" Height="40"
+                            Padding="0" HorizontalAlignment="Center"
+                            Background="Transparent" BorderThickness="0" CornerRadius="6">
+                        <FontIcon Glyph="&#xE753;" FontSize="18" Foreground="#0284C7" />
+                    </Button>
+
+                    <!-- Plugins / Extensions -->
+                    <Button x:Name="BtnNavPlugins"
+                            ToolTipService.ToolTip="外掛模組管理員"
+                            Click="BtnNavPlugins_Click"
+                            Width="40" Height="40"
+                            Padding="0" HorizontalAlignment="Center"
+                            Background="Transparent" BorderThickness="0" CornerRadius="6">
+                        <FontIcon Glyph="&#xEA86;" FontSize="18" Foreground="#10B981" />
                     </Button>
 
                     <!-- Run & Debug -->
@@ -495,7 +522,106 @@
                         </ListView>
                     </Grid>
 
-                    <!-- 5. Run & Tools View -->
+                    <!-- 5. MCP Server Center View -->
+                    <Grid x:Name="ViewMcp" Visibility="Collapsed" Margin="12,4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Spacing="4" Margin="0,0,0,8">
+                            <TextBlock Text="Model Context Protocol (MCP)" FontSize="13" FontWeight="SemiBold" />
+                            <TextBlock Text="連線本機或遠端 MCP 伺服器，賦予 Aether AI 工具調用與資料庫操作能力。" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                        </StackPanel>
+
+                        <ListView Grid.Row="1" ItemsSource="{x:Bind ViewModel.McpServers, Mode=OneWay}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="models:McpServerConfig">
+                                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,4">
+                                        <StackPanel Spacing="6">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                                    <Ellipse Width="8" Height="8" Fill="{x:Bind StatusColor, Mode=OneWay}" />
+                                                    <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" FontSize="12" />
+                                                </StackPanel>
+                                                <ToggleSwitch Grid.Column="1" IsOn="{x:Bind IsEnabled, Mode=TwoWay}" Toggled="McpServerToggle_Toggled" Tag="{x:Bind}" HorizontalAlignment="Right" OnContent="" OffContent="" />
+                                            </Grid>
+
+                                            <TextBlock Text="{x:Bind Command}" FontFamily="Cascadia Code, Consolas" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            <TextBlock Text="{x:Bind Arguments}" FontFamily="Cascadia Code, Consolas" FontSize="10" Foreground="{ThemeResource TextFillColorTertiaryBrush}" TextWrapping="Wrap" />
+
+                                            <Border Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="4" Padding="6,3" Margin="0,2,0,0">
+                                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                                    <FontIcon Glyph="&#xE756;" FontSize="10" />
+                                                    <TextBlock Text="可用工具：" FontSize="10" FontWeight="SemiBold" />
+                                                    <TextBlock Text="{x:Bind ToolsCount, Mode=OneWay}" FontSize="10" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                                    <TextBlock Text="個" FontSize="10" />
+                                                </StackPanel>
+                                            </Border>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+
+                        <Button Grid.Row="2" Content="+ 新增自訂 MCP 伺服器..." Style="{ThemeResource AccentButtonStyle}" HorizontalAlignment="Stretch" Margin="0,8,0,4" Click="BtnAddMcpServer_Click" />
+                    </Grid>
+
+                    <!-- 6. Plugins / Extension Modules View -->
+                    <Grid x:Name="ViewPlugins" Visibility="Collapsed" Margin="12,4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Spacing="4" Margin="0,0,0,8">
+                            <TextBlock Text="已安裝外掛模組" FontSize="13" FontWeight="SemiBold" />
+                            <TextBlock Text="擴充 AetherIDE 的語法檢查、排版與版本控制能力。" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+
+                        <ListView Grid.Row="1" ItemsSource="{x:Bind ViewModel.InstalledPlugins, Mode=OneWay}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="models:PluginItem">
+                                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Plugin Icon -->
+                                            <Border Grid.Column="0" Width="36" Height="36" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8" Margin="0,0,10,0">
+                                                <FontIcon Glyph="{x:Bind IconGlyph}" FontSize="18" Foreground="{x:Bind IconColor}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+
+                                            <!-- Plugin Info -->
+                                            <StackPanel Grid.Column="1" Spacing="3">
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" FontSize="12" />
+                                                    <Border Background="{ThemeResource SystemFillColorNeutralBackgroundBrush}" CornerRadius="3" Padding="4,1">
+                                                        <TextBlock Text="{x:Bind Version}" FontSize="9" />
+                                                    </Border>
+                                                </StackPanel>
+                                                <TextBlock Text="{x:Bind Description}" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                                                <TextBlock Text="{x:Bind Author}" FontSize="10" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                            </StackPanel>
+
+                                            <!-- Toggle Switch -->
+                                            <ToggleSwitch Grid.Column="2" IsOn="{x:Bind IsEnabled, Mode=TwoWay}" Toggled="PluginToggle_Toggled" Tag="{x:Bind}" HorizontalAlignment="Right" OnContent="" OffContent="" Margin="6,0,0,0" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+
+                    <!-- 7. Run & Tools View -->
                     <Grid x:Name="ViewRun" Visibility="Collapsed" Margin="12">
                         <StackPanel Spacing="16">
                             <TextBlock Text="執行與除錯環境" FontWeight="SemiBold" FontSize="14" />
@@ -519,16 +645,17 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- 6. Settings View -->
+                    <!-- 8. Settings View -->
                     <ScrollViewer x:Name="ViewSettings" Visibility="Collapsed" Padding="12">
                         <StackPanel Spacing="16">
                             <TextBlock Text="偏好設定" FontWeight="SemiBold" FontSize="14" />
 
+                            <!-- Synchronized Theme RadioButtons -->
                             <StackPanel Spacing="6">
                                 <TextBlock Text="色彩外觀" FontSize="13" FontWeight="SemiBold" />
-                                <RadioButtons SelectedIndex="0" SelectionChanged="RadioTheme_SelectionChanged">
-                                    <RadioButton Content="深色主題 (VS Dark)" Tag="Dark" IsChecked="True" />
-                                    <RadioButton Content="淺色主題 (VS Light)" Tag="Light" />
+                                <RadioButtons x:Name="ThemeRadioButtons" SelectedIndex="0" SelectionChanged="RadioTheme_SelectionChanged">
+                                    <RadioButton x:Name="RadioThemeDark" Content="深色主題 (VS Dark)" Tag="Dark" />
+                                    <RadioButton x:Name="RadioThemeLight" Content="淺色主題 (VS Light)" Tag="Light" />
                                 </RadioButtons>
                             </StackPanel>
 
@@ -546,8 +673,8 @@
 
                             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="12">
                                 <StackPanel Spacing="6">
-                                    <TextBlock Text="AetherIDE v1.0.0" FontWeight="SemiBold" FontSize="13" />
-                                    <TextBlock Text="為 Windows 平台量身打造的高效能現代 WinUI 3 程式 IDE。" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                                    <TextBlock Text="AetherIDE v1.0.3" FontWeight="SemiBold" FontSize="13" />
+                                    <TextBlock Text="為 Windows 平台量身打造的高效能現代 WinUI 3 程式 IDE，內建 MCP 伺服器中心與外掛模組擴充體系。" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
                                 </StackPanel>
                             </Border>
                         </StackPanel>
